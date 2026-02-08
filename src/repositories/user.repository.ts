@@ -1,6 +1,6 @@
 import { NotFoundError } from '../errors';
 import { User } from '../types';
-import { users } from '../storage/user';
+import { users, flushUsers } from '../storage/user';
 import { CreateUserDto } from '../schemas';
 
 export function findAll(): User[] {
@@ -22,6 +22,7 @@ export function create(userData: CreateUserDto): User {
     id: (users.length + 1).toString(),
   };
   users.push(newUser);
+  flushUsers();
 
   return newUser;
 }

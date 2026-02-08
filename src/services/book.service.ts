@@ -26,7 +26,7 @@ export function deleteBook(id: string): void {
     throw new BookBorrowedError({ message: 'Cannot delete a borrowed book' });
   }
 
-  BookRepository.softDelete(id);
+  BookRepository.remove(id);
 }
 
 export function isBookAvailable(id: string): boolean {

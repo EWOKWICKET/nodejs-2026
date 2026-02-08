@@ -2,6 +2,7 @@ import { Loan, LoanStatus } from '../types';
 import { LoanRepository } from '../repositories';
 import { CreateLoanDto } from '../schemas';
 import * as BookService from './book.service';
+import { flushLoans } from '../storage/loan';
 
 export function getLoans(): Loan[] {
   return LoanRepository.findAll();
@@ -29,6 +30,7 @@ export function returnLoan(id: string): Loan {
 
   loan.status = LoanStatus.RETURNED;
   loan.returnDate = new Date();
+  flushLoans();
 
   BookService.updateBook(loan.bookId, { available: true });
 

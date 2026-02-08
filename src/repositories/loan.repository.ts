@@ -1,6 +1,6 @@
 import { NotFoundError } from '../errors';
 import { Loan, LoanStatus } from '../types';
-import { loans } from '../storage/loan';
+import { loans, flushLoans } from '../storage/loan';
 import { CreateLoanDto } from '../schemas';
 
 export function findAll(): Loan[] {
@@ -30,6 +30,7 @@ export function create(loanData: CreateLoanDto): Loan {
     status: LoanStatus.ACTIVE,
   };
   loans.push(newLoan);
+  flushLoans();
 
   return newLoan;
 }

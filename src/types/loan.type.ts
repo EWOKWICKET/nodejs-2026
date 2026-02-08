@@ -1,11 +1,9 @@
-import { SoftDelete } from './soft-delete';
-
 export enum LoanStatus {
   ACTIVE = 'ACTIVE',
   RETURNED = 'RETURNED',
 }
 
-export type Loan = SoftDelete & {
+export type Loan = {
   id: string;
   userId: string;
   bookId: string;

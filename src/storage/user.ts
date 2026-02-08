@@ -1,9 +1,8 @@
+import { join } from 'path';
 import { User } from '../types';
+import { createJsonStorage } from './json-storage';
 
-export const users: User[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-  },
-];
+const storage = createJsonStorage<User>(join(__dirname, '../../data/users.json'));
+
+export const users = storage.items;
+export const flushUsers = storage.flush;

@@ -1,6 +1,4 @@
-import { SoftDelete } from './soft-delete';
-
-export type User = SoftDelete & {
+export type User = {
   id: string;
   name: string;
   email: string;

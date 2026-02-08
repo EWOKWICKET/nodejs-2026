@@ -1,6 +1,6 @@
 import { NotFoundError } from '../errors';
 import { Book } from '../types';
-import { books } from '../storage/book';
+import { books, flushBooks } from '../storage/book';
 import { CreateBookDto } from '../schemas';
 
 export function findAll(): Book[] {
@@ -23,6 +23,7 @@ export function create(bookData: CreateBookDto): Book {
     available: true,
   };
   books.push(newBook);
+  flushBooks();
 
   return newBook;
 }
@@ -33,13 +34,15 @@ export function update(id: string, data: Partial<Book>): Book {
     ...books[index],
     ...data,
   };
+  flushBooks();
 
   return books[index];
 }
 
-export function softDelete(id: string): void {
+export function remove(id: string): void {
   const index = findIndexByIdOrFail(id);
-  books[index].isDeleted = true;
+  books.splice(index, 1);
+  flushBooks();
 }
 
 function findIndexByIdOrFail(id: string): number {
