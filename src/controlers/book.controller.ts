@@ -21,10 +21,6 @@ export function getBookById(req: GetBookByIdRequest, res: Response) {
   const { id } = req.params;
   const book = BookService.getBookById(id);
 
-  if (!book) {
-    return res.status(404).json({ message: 'Book not found' });
-  }
-
   res.status(200).json(book);
 }
 
@@ -40,20 +36,12 @@ export function updateBook(req: UpdateBookRequest, res: Response) {
   const body = req.body;
   const book = BookService.updateBook(id, body);
 
-  if (!book) {
-    return res.status(404).json({ message: 'Book not found' });
-  }
-
   res.status(200).json(book);
 }
 
 export function deleteBook(req: DeleteBookRequest, res: Response) {
   const { id } = req.params;
-  const deleted = BookService.deleteBook(id);
-
-  if (!deleted) {
-    return res.status(404).json({ message: 'Book not found' });
-  }
+  BookService.deleteBook(id);
 
   res.status(204).send();
 }

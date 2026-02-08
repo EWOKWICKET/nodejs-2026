@@ -1,14 +1,18 @@
 import { Book } from '../types';
 import { books } from '../storage/book';
+import { NotFoundError } from '../errors';
 
 export function getBooks(): Book[] {
   return books;
 }
 
-export function getBookById(id: string): Book | null {
+export function getBookById(id: string): Book {
   const book = books.find((book) => book.id === id);
+  if (!book) {
+    throw new NotFoundError({ message: 'Book not found' });
+  }
 
-  return book ?? null;
+  return book;
 }
 
 export function createBook(createBookDto: Book): Book {
@@ -17,11 +21,11 @@ export function createBook(createBookDto: Book): Book {
   return createBookDto;
 }
 
-export function updateBook(id: string, updateBookDto: Book): Book | null {
+export function updateBook(id: string, updateBookDto: Book): Book {
   // as no database is used, should use index for data modifying
   const bookIndex = books.findIndex((book) => book.id === id);
   if (bookIndex === -1) {
-    return null;
+    throw new NotFoundError({ message: 'Book not found' });
   }
 
   books[bookIndex] = {
@@ -32,13 +36,11 @@ export function updateBook(id: string, updateBookDto: Book): Book | null {
   return books[bookIndex];
 }
 
-export function deleteBook(id: string): boolean {
+export function deleteBook(id: string): void {
   const bookIndex = books.findIndex((book) => book.id === id);
   if (bookIndex === -1) {
-    return false;
+    throw new NotFoundError({ message: 'Book not found' });
   }
 
   books[bookIndex].isDeleted = true;
-
-  return true;
 }

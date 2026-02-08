@@ -26,9 +26,5 @@ export function returnLoan(req: ReturnLoanRequest, res: Response) {
   const { id } = req.params;
   const loan = LoanService.returnLoan(id);
 
-  if (!loan) {
-    return res.status(404).json({ message: 'Loan not found' });
-  }
-
   res.status(200).json(loan);
 }
