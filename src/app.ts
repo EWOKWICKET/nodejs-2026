@@ -1,8 +1,11 @@
-import express, { Request, Response } from "express";
-import routes from "./routes";
+import express from 'express';
+import routes from './routes';
 
 const app = express();
 
-app.get('/', routes);
+// global middleware for body parsing
+app.use(express.json());
+
+app.use('/api', routes);
 
 export default app;
