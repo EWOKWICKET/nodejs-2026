@@ -19,7 +19,7 @@ export function getBooks(_req: Request, res: Response) {
 
 export function getBookById(req: GetBookByIdRequest, res: Response) {
   const { id } = req.params;
-  const book = BookService.getBookById(id);
+  const book = BookService.getBookByIdOrFail(id);
 
   res.status(200).json(book);
 }

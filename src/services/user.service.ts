@@ -1,22 +1,14 @@
 import { User } from '../types';
-import { users } from '../storage/user';
-import { NotFoundError } from '../errors';
+import { UserRepository } from '../repositories';
 
 export function getUsers(): User[] {
-  return users;
+  return UserRepository.findAll();
 }
 
 export function getUserById(id: string): User {
-  const user = users.find((user) => user.id === id);
-  if (!user) {
-    throw new NotFoundError({ message: 'User not found' });
-  }
-
-  return user;
+  return UserRepository.findByIdOrFail(id);
 }
 
 export function createUser(createUserDto: User): User {
-  users.push({ ...createUserDto, id: (users.length + 1).toString() });
-
-  return createUserDto;
+  return UserRepository.create(createUserDto);
 }

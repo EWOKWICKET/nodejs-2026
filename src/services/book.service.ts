@@ -1,46 +1,28 @@
 import { Book } from '../types';
-import { books } from '../storage/book';
-import { NotFoundError } from '../errors';
+import { BookRepository } from '../repositories';
 
 export function getBooks(): Book[] {
-  return books;
+  return BookRepository.findAll();
 }
 
-export function getBookById(id: string): Book {
-  const book = books.find((book) => book.id === id);
-  if (!book) {
-    throw new NotFoundError({ message: 'Book not found' });
-  }
-
-  return book;
+export function getBookByIdOrFail(id: string): Book {
+  return BookRepository.findByIdOrFail(id);
 }
 
 export function createBook(createBookDto: Book): Book {
-  books.push({ ...createBookDto, id: (books.length + 1).toString() });
-
-  return createBookDto;
+  return BookRepository.create(createBookDto);
 }
 
-export function updateBook(id: string, updateBookDto: Book): Book {
-  // as no database is used, should use index for data modifying
-  const bookIndex = books.findIndex((book) => book.id === id);
-  if (bookIndex === -1) {
-    throw new NotFoundError({ message: 'Book not found' });
-  }
-
-  books[bookIndex] = {
-    ...books[bookIndex],
-    ...updateBookDto,
-  };
-
-  return books[bookIndex];
+export function updateBook(id: string, updateBookDto: Partial<Book>): Book {
+  return BookRepository.update(id, updateBookDto);
 }
 
 export function deleteBook(id: string): void {
-  const bookIndex = books.findIndex((book) => book.id === id);
-  if (bookIndex === -1) {
-    throw new NotFoundError({ message: 'Book not found' });
-  }
+  BookRepository.softDelete(id);
+}
 
-  books[bookIndex].isDeleted = true;
+export function isBookAvailable(id: string): boolean {
+  const book = getBookByIdOrFail(id);
+
+  return book.available;
 }
