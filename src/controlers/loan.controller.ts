@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { LoanService } from '../services';
-import { Loan } from '../types';
+import { CreateLoanDto } from '../schemas';
 
 type LoanParams = {
   id: string;
 };
 
-type CreateLoanRequest = Request<{}, {}, Loan>;
+type CreateLoanRequest = Request<{}, {}, CreateLoanDto>;
 type ReturnLoanRequest = Request<LoanParams>;
 
 export function getLoans(_req: Request, res: Response) {

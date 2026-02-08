@@ -1,6 +1,7 @@
 import { NotFoundError } from '../errors';
 import { User } from '../types';
 import { users } from '../storage/user';
+import { CreateUserDto } from '../schemas';
 
 export function findAll(): User[] {
   return users;
@@ -15,7 +16,7 @@ export function findByIdOrFail(id: string): User {
   return user;
 }
 
-export function create(userData: User): User {
+export function create(userData: CreateUserDto): User {
   const newUser = {
     ...userData,
     id: (users.length + 1).toString(),

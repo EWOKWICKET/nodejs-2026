@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services';
-import { User } from '../types';
+import { CreateUserDto } from '../schemas';
 
 type UserParams = {
   id: string;
 };
 
 type GetUserByIdRequest = Request<UserParams>;
-type CreateUserRequest = Request<{}, {}, User>;
+type CreateUserRequest = Request<{}, {}, CreateUserDto>;
 
 export function getUsers(_req: Request, res: Response) {
   const users = UserService.getUsers();

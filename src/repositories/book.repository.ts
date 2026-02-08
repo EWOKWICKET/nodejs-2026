@@ -1,6 +1,7 @@
 import { NotFoundError } from '../errors';
 import { Book } from '../types';
 import { books } from '../storage/book';
+import { CreateBookDto } from '../schemas';
 
 export function findAll(): Book[] {
   return books;
@@ -15,7 +16,7 @@ export function findByIdOrFail(id: string): Book {
   return book;
 }
 
-export function create(bookData: Book): Book {
+export function create(bookData: CreateBookDto): Book {
   const newBook = {
     ...bookData,
     id: (books.length + 1).toString(),

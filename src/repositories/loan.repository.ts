@@ -1,6 +1,7 @@
 import { NotFoundError } from '../errors';
-import { Loan } from '../types';
+import { Loan, LoanStatus } from '../types';
 import { loans } from '../storage/loan';
+import { CreateLoanDto } from '../schemas';
 
 export function findAll(): Loan[] {
   return loans;
@@ -21,10 +22,12 @@ export function findByBookId(bookId: string): Loan | null {
   return loan ?? null;
 }
 
-export function create(loanData: Loan): Loan {
-  const newLoan = {
+export function create(loanData: CreateLoanDto): Loan {
+  const newLoan: Loan = {
     ...loanData,
     id: (loans.length + 1).toString(),
+    loanDate: new Date(),
+    status: LoanStatus.ACTIVE,
   };
   loans.push(newLoan);
 

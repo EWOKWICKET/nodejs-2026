@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { BookService } from '../services';
-import { Book } from '../types';
+import { CreateBookDto, UpdateBookDto } from '../schemas';
 
 type BookParams = {
   id: string;
 };
 
 type GetBookByIdRequest = Request<BookParams>;
-type CreateBookRequest = Request<{}, {}, Book>;
-type UpdateBookRequest = Request<BookParams, {}, Book>;
+type CreateBookRequest = Request<{}, {}, CreateBookDto>;
+type UpdateBookRequest = Request<BookParams, {}, UpdateBookDto>;
 type DeleteBookRequest = Request<BookParams>;
 
 export function getBooks(_req: Request, res: Response) {

@@ -1,5 +1,6 @@
 import { Book } from '../types';
 import { BookRepository } from '../repositories';
+import { CreateBookDto } from '../schemas';
 
 export function getBooks(): Book[] {
   return BookRepository.findAll();
@@ -9,7 +10,7 @@ export function getBookByIdOrFail(id: string): Book {
   return BookRepository.findByIdOrFail(id);
 }
 
-export function createBook(createBookDto: Book): Book {
+export function createBook(createBookDto: CreateBookDto): Book {
   return BookRepository.create(createBookDto);
 }
 
