@@ -22,6 +22,14 @@ export function findByBookId(bookId: string): Loan | null {
   return loan ?? null;
 }
 
+export function update(id: string, data: Partial<Loan>): Loan {
+  const loan = findByIdOrFail(id);
+  Object.assign(loan, data);
+  flushLoans();
+
+  return loan;
+}
+
 export function create(loanData: CreateLoanDto): Loan {
   const newLoan: Loan = {
     ...loanData,

@@ -28,9 +28,3 @@ export function deleteBook(id: string): void {
 
   BookRepository.remove(id);
 }
-
-export function isBookAvailable(id: string): boolean {
-  const book = getBookByIdOrFail(id);
-
-  return book.available;
-}

@@ -29,14 +29,11 @@ export function create(bookData: CreateBookDto): Book {
 }
 
 export function update(id: string, data: Partial<Book>): Book {
-  const index = findIndexByIdOrFail(id);
-  books[index] = {
-    ...books[index],
-    ...data,
-  };
+  const book = findByIdOrFail(id);
+  Object.assign(book, data);
   flushBooks();
 
-  return books[index];
+  return book;
 }
 
 export function remove(id: string): void {
