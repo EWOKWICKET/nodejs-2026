@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { PrismaClientKnownRequestError } from '../generated/prisma/runtime/library';
-import { BookBorrowedError, NotFoundError } from '../errors';
+import { BookBorrowedError, ForbiddenError, NotFoundError, UnauthorizedError } from '../errors';
 
 export function exceptionFilterMiddleware(
   err: Error,
@@ -23,6 +23,18 @@ export function exceptionFilterMiddleware(
 
   if (err instanceof ZodError) {
     res.status(400).json({ message: 'Validation error', errors: err.issues });
+
+    return;
+  }
+
+  if (err instanceof UnauthorizedError) {
+    res.status(401).json({ message: err.message });
+
+    return;
+  }
+
+  if (err instanceof ForbiddenError) {
+    res.status(403).json({ message: err.message });
 
     return;
   }
