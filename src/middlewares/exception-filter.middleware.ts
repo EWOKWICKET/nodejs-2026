@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
-import { PrismaClientKnownRequestError } from '../generated/prisma/runtime/library';
 import { BookBorrowedError, ForbiddenError, NotFoundError, UnauthorizedError } from '../errors';
 
 export function exceptionFilterMiddleware(
@@ -39,7 +38,7 @@ export function exceptionFilterMiddleware(
     return;
   }
 
-  if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+  if ('code' in err && (err as { code: string }).code === 'P2025') {
     res.status(404).json({ message: 'Record not found' });
 
     return;
