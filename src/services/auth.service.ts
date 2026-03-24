@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../repositories';
 import { RegisterDto, LoginDto } from '../schemas';
-import { UnauthorizedError } from '../errors';
+import { UnauthorizedError, ConflictError } from '../errors';
 import { JwtPayload, Role } from '../types';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -10,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 export async function register(dto: RegisterDto) {
   const existing = await UserRepository.findByEmail(dto.email);
   if (existing) {
-    throw new Error('Email already in use');
+    throw new ConflictError({ message: 'Email already in use' });
   }
 
   const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -40,5 +40,7 @@ export async function login(dto: LoginDto) {
   const payload: JwtPayload = { userId: user.id, email: user.email, role: user.role };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
-  return { token };
+  const { passwordHash: _, ...userPublic } = user;
+
+  return { token, user: userPublic };
 }
