@@ -1,30 +1,28 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services';
-import { CreateUserDto } from '../schemas';
+import { JwtPayload } from '../types';
 
-type UserParams = {
-  id: string;
-};
-
+type UserParams = { id: string };
 type GetUserByIdRequest = Request<UserParams>;
-type CreateUserRequest = Request<{}, {}, CreateUserDto>;
 
-export function getUsers(_req: Request, res: Response) {
-  const users = UserService.getUsers();
-
-  res.status(200).json(users);
+export async function getUsers(_req: Request, res: Response) {
+  const users = await UserService.getUsers();
+  res.status(200).json(users.map(omitPasswordHash));
 }
 
-export function getUserById(req: GetUserByIdRequest, res: Response) {
-  const { id } = req.params;
-  const user = UserService.getUserById(id);
-
-  res.status(200).json(user);
+export async function getUserById(req: GetUserByIdRequest, res: Response) {
+  const user = await UserService.getUserById(req.params.id);
+  res.status(200).json(omitPasswordHash(user));
 }
 
-export function createUser(req: CreateUserRequest, res: Response) {
-  const body = req.body;
-  const user = UserService.createUser(body);
+export async function getMe(req: Request, res: Response) {
+  const { userId } = req.user as JwtPayload;
+  const user = await UserService.getUserById(userId);
+  res.status(200).json(omitPasswordHash(user));
+}
 
-  res.status(201).json(user);
+function omitPasswordHash<T extends { passwordHash: string }>(user: T): Omit<T, 'passwordHash'> {
+  const { passwordHash: _, ...rest } = user;
+
+  return rest;
 }
