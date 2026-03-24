@@ -16,7 +16,7 @@ export async function getUserById(req: GetUserByIdRequest, res: Response) {
 }
 
 export async function getMe(req: Request, res: Response) {
-  const { userId } = req.user as JwtPayload;
+  const { userId } = (req as unknown as { user: JwtPayload }).user;
   const user = await UserService.getUserById(userId);
   res.status(200).json(omitPasswordHash(user));
 }

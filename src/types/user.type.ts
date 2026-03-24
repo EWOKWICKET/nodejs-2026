@@ -1,7 +1,6 @@
-export enum Role {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-}
+import { Role } from '../db/generated/prisma/enums';
+
+export { Role };
 
 export type User = {
   id: string;

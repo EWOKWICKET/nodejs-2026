@@ -4,7 +4,7 @@ import { JwtPayload, Role } from '../types';
 
 export function requireRole(...roles: Role[]) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    const { role } = req.user as JwtPayload;
+    const { role } = (req as unknown as { user: JwtPayload }).user;
 
     if (!roles.includes(role)) {
       return next(new ForbiddenError({ message: 'Insufficient permissions' }));

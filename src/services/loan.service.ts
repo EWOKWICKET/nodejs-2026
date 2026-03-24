@@ -2,6 +2,7 @@ import { Loan, LoanStatus, Role } from '../types';
 import { LoanRepository } from '../repositories';
 import { CreateLoanDto } from '../schemas';
 import * as BookService from './book.service';
+import { BookBorrowedError } from '../errors';
 
 export async function getLoans(userId: string, role: Role): Promise<Loan[]> {
   if (role === Role.ADMIN) {
@@ -15,12 +16,12 @@ export async function createLoan(createLoanDto: CreateLoanDto): Promise<Loan> {
   const book = await BookService.getBookByIdOrFail(createLoanDto.bookId);
 
   if (!book.available) {
-    throw new Error('Book is unavailable');
+    throw new BookBorrowedError({ message: 'Book is unavailable' });
   }
 
   const existingLoan = await LoanRepository.findActiveByBookId(createLoanDto.bookId);
   if (existingLoan) {
-    throw new Error('Book is already borrowed');
+    throw new BookBorrowedError({ message: 'Book is already borrowed' });
   }
 
   const newLoan = await LoanRepository.create(createLoanDto);

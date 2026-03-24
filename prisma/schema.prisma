@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/db/generated/prisma"
 }
 
 datasource db {
@@ -43,6 +43,6 @@ model Loan {
   loanDate   DateTime   @default(now())
   returnDate DateTime?
   status     LoanStatus @default(ACTIVE)
-  user       User       @relation(fields: [userId], references: [id])
-  book       Book       @relation(fields: [bookId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book       Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
 }

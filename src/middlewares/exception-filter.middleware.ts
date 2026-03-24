@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, NextFunction } from 'express';
+import { Response } from 'express-serve-static-core';
 import { ZodError } from 'zod';
 import { BookBorrowedError, ForbiddenError, NotFoundError, UnauthorizedError } from '../errors';
 
