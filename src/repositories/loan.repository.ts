@@ -1,14 +1,18 @@
+import { prisma } from '../db/prisma';
 import { NotFoundError } from '../errors';
 import { Loan, LoanStatus } from '../types';
-import { loans, flushLoans } from '../storage/loan';
 import { CreateLoanDto } from '../schemas';
 
-export function findAll(): Loan[] {
-  return loans;
+export async function findAll(): Promise<Loan[]> {
+  return prisma.loan.findMany();
 }
 
-export function findByIdOrFail(id: string): Loan {
-  const loan = loans.find((loan) => loan.id === id);
+export async function findByUserId(userId: string): Promise<Loan[]> {
+  return prisma.loan.findMany({ where: { userId } });
+}
+
+export async function findByIdOrFail(id: string): Promise<Loan> {
+  const loan = await prisma.loan.findUnique({ where: { id } });
   if (!loan) {
     throw new NotFoundError({ message: 'Loan not found' });
   }
@@ -16,29 +20,16 @@ export function findByIdOrFail(id: string): Loan {
   return loan;
 }
 
-export function findByBookId(bookId: string): Loan | null {
-  const loan = loans.find((loan) => loan.bookId === bookId);
-
-  return loan ?? null;
+export async function findActiveByBookId(bookId: string): Promise<Loan | null> {
+  return prisma.loan.findFirst({ where: { bookId, status: LoanStatus.ACTIVE } });
 }
 
-export function update(id: string, data: Partial<Loan>): Loan {
-  const loan = findByIdOrFail(id);
-  Object.assign(loan, data);
-  flushLoans();
-
-  return loan;
+export async function create(loanData: CreateLoanDto): Promise<Loan> {
+  return prisma.loan.create({
+    data: { ...loanData, loanDate: new Date(), status: LoanStatus.ACTIVE },
+  });
 }
 
-export function create(loanData: CreateLoanDto): Loan {
-  const newLoan: Loan = {
-    ...loanData,
-    id: (loans.length + 1).toString(),
-    loanDate: new Date(),
-    status: LoanStatus.ACTIVE,
-  };
-  loans.push(newLoan);
-  flushLoans();
-
-  return newLoan;
+export async function update(id: string, data: Partial<Loan>): Promise<Loan> {
+  return prisma.loan.update({ where: { id }, data });
 }

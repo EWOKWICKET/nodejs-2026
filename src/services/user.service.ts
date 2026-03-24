@@ -1,15 +1,10 @@
 import { User } from '../types';
 import { UserRepository } from '../repositories';
-import { CreateUserDto } from '../schemas';
 
-export function getUsers(): User[] {
+export async function getUsers(): Promise<User[]> {
   return UserRepository.findAll();
 }
 
-export function getUserById(id: string): User {
+export async function getUserById(id: string): Promise<User> {
   return UserRepository.findByIdOrFail(id);
-}
-
-export function createUser(createUserDto: CreateUserDto): User {
-  return UserRepository.create(createUserDto);
 }
