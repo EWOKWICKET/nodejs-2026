@@ -25,7 +25,8 @@ export async function createLoan(req: CreateLoanRequest, res: Response) {
 }
 
 export async function returnLoan(req: ReturnLoanRequest, res: Response) {
-  const loan = await LoanService.returnLoan(req.params.id);
+  const { userId, role } = (req as unknown as { user: JwtPayload }).user;
+  const loan = await LoanService.returnLoan(req.params.id, userId, role);
 
   res.status(200).json(loan);
 }
