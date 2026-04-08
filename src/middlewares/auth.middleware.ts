@@ -13,7 +13,11 @@ export function authenticate(req: Request, _res: Response, next: NextFunction) {
   }
 
   try {
-    (req as unknown as { user: JwtPayload }).user = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    if (!payload.userId) {
+      return next(new UnauthorizedError({ message: 'Invalid token payload' }));
+    }
+    (req as unknown as { user: JwtPayload }).user = payload;
     next();
   } catch {
     next(new UnauthorizedError({ message: 'Invalid or expired token' }));
