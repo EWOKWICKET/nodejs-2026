@@ -7,9 +7,7 @@ import { Role } from '../types';
 const router = express.Router();
 
 router.get('/', BookController.getBooks);
-
 router.get('/:id', BookController.getBookById);
-
 router.post(
   '/',
   authenticate,
@@ -17,7 +15,6 @@ router.post(
   validate(createBookSchema),
   BookController.createBook,
 );
-
 router.put(
   '/:id',
   authenticate,
@@ -25,7 +22,6 @@ router.put(
   validate(updateBookSchema),
   BookController.updateBook,
 );
-
 router.delete('/:id', authenticate, requireRole(Role.ADMIN), BookController.deleteBook);
 
 export default router;

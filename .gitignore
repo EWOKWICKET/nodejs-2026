@@ -4,4 +4,3 @@ data/
 !README.md
 .env
 **/generated/prisma
-uploads/
