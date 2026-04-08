@@ -1,14 +1,13 @@
+import { prisma } from '../db/prisma';
 import { NotFoundError } from '../errors';
 import { User } from '../types';
-import { users, flushUsers } from '../storage/user';
-import { CreateUserDto } from '../schemas';
 
-export function findAll(): User[] {
-  return users;
+export async function findAll(): Promise<User[]> {
+  return prisma.user.findMany();
 }
 
-export function findByIdOrFail(id: string): User {
-  const user = users.find((user) => user.id === id);
+export async function findByIdOrFail(id: string): Promise<User> {
+  const user = await prisma.user.findUnique({ where: { id } });
   if (!user) {
     throw new NotFoundError({ message: 'User not found' });
   }
@@ -16,13 +15,10 @@ export function findByIdOrFail(id: string): User {
   return user;
 }
 
-export function create(userData: CreateUserDto): User {
-  const newUser = {
-    ...userData,
-    id: (users.length + 1).toString(),
-  };
-  users.push(newUser);
-  flushUsers();
+export async function findByEmail(email: string): Promise<User | null> {
+  return prisma.user.findUnique({ where: { email } });
+}
 
-  return newUser;
+export async function create(data: Omit<User, 'id'>): Promise<User> {
+  return prisma.user.create({ data });
 }

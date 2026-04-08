@@ -3,28 +3,28 @@ import { BookRepository } from '../repositories';
 import { CreateBookDto } from '../schemas';
 import { BookBorrowedError } from '../errors';
 
-export function getBooks(): Book[] {
+export async function getBooks(): Promise<Book[]> {
   return BookRepository.findAll();
 }
 
-export function getBookByIdOrFail(id: string): Book {
+export async function getBookByIdOrFail(id: string): Promise<Book> {
   return BookRepository.findByIdOrFail(id);
 }
 
-export function createBook(createBookDto: CreateBookDto): Book {
+export async function createBook(createBookDto: CreateBookDto): Promise<Book> {
   return BookRepository.create(createBookDto);
 }
 
-export function updateBook(id: string, updateBookDto: Partial<Book>): Book {
+export async function updateBook(id: string, updateBookDto: Partial<Book>): Promise<Book> {
   return BookRepository.update(id, updateBookDto);
 }
 
-export function deleteBook(id: string): void {
-  const book = getBookByIdOrFail(id);
+export async function deleteBook(id: string): Promise<void> {
+  const book = await getBookByIdOrFail(id);
 
   if (!book.available) {
     throw new BookBorrowedError({ message: 'Cannot delete a borrowed book' });
   }
 
-  BookRepository.remove(id);
+  await BookRepository.remove(id);
 }

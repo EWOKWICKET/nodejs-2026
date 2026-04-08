@@ -1,36 +1,43 @@
-import { Loan, LoanStatus } from '../types';
+import { Loan, LoanStatus, Role } from '../types';
 import { LoanRepository } from '../repositories';
 import { CreateLoanDto } from '../schemas';
 import * as BookService from './book.service';
+import { BookBorrowedError } from '../errors';
 
-export function getLoans(): Loan[] {
-  return LoanRepository.findAll();
+export async function getLoans(userId: string, role: Role): Promise<Loan[]> {
+  if (role === Role.ADMIN) {
+    return LoanRepository.findAll();
+  }
+
+  return LoanRepository.findByUserId(userId);
 }
 
-export function createLoan(createLoanDto: CreateLoanDto): Loan {
-  if (!BookService.getBookByIdOrFail(createLoanDto.bookId).available) {
-    throw new Error('Book is unavailable');
+export async function createLoan(createLoanDto: CreateLoanDto): Promise<Loan> {
+  const book = await BookService.getBookByIdOrFail(createLoanDto.bookId);
+
+  if (!book.available) {
+    throw new BookBorrowedError({ message: 'Book is unavailable' });
   }
 
-  const existingLoan = LoanRepository.findByBookId(createLoanDto.bookId);
+  const existingLoan = await LoanRepository.findActiveByBookId(createLoanDto.bookId);
   if (existingLoan) {
-    throw new Error('Book is already borrowed');
+    throw new BookBorrowedError({ message: 'Book is already borrowed' });
   }
 
-  const newLoan = LoanRepository.create(createLoanDto);
+  const newLoan = await LoanRepository.create(createLoanDto);
 
-  BookService.updateBook(createLoanDto.bookId, { available: false });
+  await BookService.updateBook(createLoanDto.bookId, { available: false });
 
   return newLoan;
 }
 
-export function returnLoan(id: string): Loan {
-  const loan = LoanRepository.update(id, {
+export async function returnLoan(id: string): Promise<Loan> {
+  const loan = await LoanRepository.update(id, {
     status: LoanStatus.RETURNED,
     returnDate: new Date(),
   });
 
-  BookService.updateBook(loan.bookId, { available: true });
+  await BookService.updateBook(loan.bookId, { available: true });
 
   return loan;
 }

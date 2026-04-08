@@ -1,6 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, NextFunction } from 'express';
+import { Response } from 'express-serve-static-core';
 import { ZodError } from 'zod';
-import { BookBorrowedError, NotFoundError } from '../errors';
+import {
+  BookBorrowedError,
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../errors';
 
 export function exceptionFilterMiddleware(
   err: Error,
@@ -22,6 +29,30 @@ export function exceptionFilterMiddleware(
 
   if (err instanceof ZodError) {
     res.status(400).json({ message: 'Validation error', errors: err.issues });
+
+    return;
+  }
+
+  if (err instanceof UnauthorizedError) {
+    res.status(401).json({ message: err.message });
+
+    return;
+  }
+
+  if (err instanceof ConflictError) {
+    res.status(409).json({ message: err.message });
+
+    return;
+  }
+
+  if (err instanceof ForbiddenError) {
+    res.status(403).json({ message: err.message });
+
+    return;
+  }
+
+  if ('code' in err && (err as { code: string }).code === 'P2025') {
+    res.status(404).json({ message: 'Record not found' });
 
     return;
   }

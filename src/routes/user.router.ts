@@ -1,14 +1,14 @@
 import express from 'express';
 import { UserController } from '../controlers';
-import { validate } from '../middlewares';
-import { createUserSchema } from '../schemas';
+import { authenticate, requireRole } from '../middlewares';
+import { Role } from '../types';
 
 const router = express.Router();
 
-router.get('/', UserController.getUsers);
+router.get('/', authenticate, requireRole(Role.ADMIN), UserController.getUsers);
 
-router.get('/:id', UserController.getUserById);
+router.get('/me', authenticate, UserController.getMe);
 
-router.post('/', validate(createUserSchema), UserController.createUser);
+router.get('/:id', authenticate, requireRole(Role.ADMIN), UserController.getUserById);
 
 export default router;

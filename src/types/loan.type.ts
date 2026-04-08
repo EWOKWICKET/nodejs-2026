@@ -1,7 +1,6 @@
-export enum LoanStatus {
-  ACTIVE = 'ACTIVE',
-  RETURNED = 'RETURNED',
-}
+import { LoanStatus } from '../db/generated/prisma/enums';
+
+export { LoanStatus };
 
 export type Loan = {
   id: string;

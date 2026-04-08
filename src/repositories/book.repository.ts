@@ -1,14 +1,14 @@
+import { prisma } from '../db/prisma';
 import { NotFoundError } from '../errors';
 import { Book } from '../types';
-import { books, flushBooks } from '../storage/book';
 import { CreateBookDto } from '../schemas';
 
-export function findAll(): Book[] {
-  return books;
+export async function findAll(): Promise<Book[]> {
+  return prisma.book.findMany();
 }
 
-export function findByIdOrFail(id: string): Book {
-  const book = books.find((book) => book.id === id);
+export async function findByIdOrFail(id: string): Promise<Book> {
+  const book = await prisma.book.findUnique({ where: { id } });
   if (!book) {
     throw new NotFoundError({ message: 'Book not found' });
   }
@@ -16,37 +16,16 @@ export function findByIdOrFail(id: string): Book {
   return book;
 }
 
-export function create(bookData: CreateBookDto): Book {
-  const newBook = {
-    ...bookData,
-    id: (books.length + 1).toString(),
-    available: true,
-  };
-  books.push(newBook);
-  flushBooks();
-
-  return newBook;
+export async function create(bookData: CreateBookDto): Promise<Book> {
+  return prisma.book.create({
+    data: { ...bookData, available: true },
+  });
 }
 
-export function update(id: string, data: Partial<Book>): Book {
-  const book = findByIdOrFail(id);
-  Object.assign(book, data);
-  flushBooks();
-
-  return book;
+export async function update(id: string, data: Partial<Book>): Promise<Book> {
+  return prisma.book.update({ where: { id }, data });
 }
 
-export function remove(id: string): void {
-  const index = findIndexByIdOrFail(id);
-  books.splice(index, 1);
-  flushBooks();
-}
-
-function findIndexByIdOrFail(id: string): number {
-  const bookIndex = books.findIndex((book) => book.id === id);
-  if (bookIndex === -1) {
-    throw new NotFoundError({ message: 'Book not found' });
-  }
-
-  return bookIndex;
+export async function remove(id: string): Promise<void> {
+  await prisma.book.delete({ where: { id } });
 }
