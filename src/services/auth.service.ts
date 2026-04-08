@@ -15,7 +15,7 @@ export async function register(dto: RegisterDto) {
     throw new ConflictError({ message: 'Email already in use' });
   }
 
-  const passwordHash = await bcrypt.hash(dto.password, 10);
+  const passwordHash = hashPassword(dto.password);
   const user = await UserRepository.create({
     name: dto.name,
     email: dto.email,
@@ -71,6 +71,10 @@ export async function resetPassword(dto: ResetPasswordDto): Promise<void> {
     throw new BadRequestError({ message: 'Invalid or expired token' });
   }
 
-  const passwordHash = await bcrypt.hash(dto.password, 10);
+  const passwordHash = hashPassword(dto.password);
   await UserRepository.update(user.id, { passwordHash });
+}
+
+function hashPassword(password: string): string {
+  return bcrypt.hashSync(password, 10);
 }

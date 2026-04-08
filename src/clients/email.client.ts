@@ -16,12 +16,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendMail({ to, subject, text, html }: SendMailParams): Promise<void> {
+export async function sendMail(sendMailParams: SendMailParams): Promise<void> {
   await transporter.sendMail({
     from: process.env.SMTP_FROM!,
-    to,
-    subject,
-    text,
-    html,
+    ...sendMailParams,
   });
 }
