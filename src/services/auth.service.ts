@@ -5,7 +5,7 @@ import { RegisterDto, LoginDto } from '../schemas';
 import { UnauthorizedError, ConflictError, BadRequestError } from '../errors';
 import { JwtPayload, Role } from '../types';
 import { RequestPasswordResetDto, ResetPasswordDto } from '../schemas';
-import { sendPasswordResetEmail } from '../utils/sendMail';
+import { sendPasswordResetEmail } from '../notifications/email';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
