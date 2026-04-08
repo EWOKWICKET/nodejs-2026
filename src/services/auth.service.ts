@@ -19,6 +19,7 @@ export async function register(dto: RegisterDto) {
     email: dto.email,
     passwordHash,
     role: Role.USER,
+    avatarUrl: null,
   });
 
   const { passwordHash: _, ...rest } = user;

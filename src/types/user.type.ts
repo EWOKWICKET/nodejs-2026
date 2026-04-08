@@ -8,4 +8,5 @@ export type User = {
   email: string;
   passwordHash: string;
   role: Role;
+  avatarUrl: string | null;
 };

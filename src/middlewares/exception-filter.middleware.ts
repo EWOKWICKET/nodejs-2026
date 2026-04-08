@@ -2,6 +2,7 @@ import { Request, NextFunction } from 'express';
 import { Response } from 'express-serve-static-core';
 import { ZodError } from 'zod';
 import {
+  BadRequestError,
   BookBorrowedError,
   ConflictError,
   ForbiddenError,
@@ -47,6 +48,12 @@ export function exceptionFilterMiddleware(
 
   if (err instanceof ForbiddenError) {
     res.status(403).json({ message: err.message });
+
+    return;
+  }
+
+  if (err instanceof BadRequestError) {
+    res.status(400).json({ message: err.message });
 
     return;
   }
