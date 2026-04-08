@@ -77,5 +77,11 @@ export function exceptionFilterMiddleware(
     return;
   }
 
+  console.error('[exception-filter] unhandled error:', {
+    name: err.name,
+    message: err.message,
+    stack: err.stack,
+  });
+
   res.status(500).json({ message: 'Internal server error' });
 }
