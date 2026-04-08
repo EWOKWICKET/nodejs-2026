@@ -1,7 +1,7 @@
 import { User } from '../types';
 import { UserRepository } from '../repositories';
 import { NotFoundError } from '../errors';
-import { uploadToCloudinary, deleteFromCloudinary } from '../storage/cloudinary';
+import { uploadToCloudinary, deleteFromCloudinary } from '../clients/cloudinary.client';
 
 export async function getUsers(): Promise<User[]> {
   return UserRepository.findAll();

@@ -1,5 +1,12 @@
 import nodemailer from 'nodemailer';
 
+type SendMailParams = {
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+};
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST!,
   port: Number(process.env.SMTP_PORT!),
@@ -9,12 +16,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendPasswordResetEmail(to: string, token: string): Promise<void> {
+export async function sendMail({ to, subject, text, html }: SendMailParams): Promise<void> {
   await transporter.sendMail({
     from: process.env.SMTP_FROM!,
     to,
-    subject: 'Password Reset',
-    text: `POST /api/auth/reset-password with { "token": "${token}", "password": "..." }`,
-    html: `<p>POST /api/auth/reset-password with body: <code>{ "token": "${token}", "password": "..." }</code></p>`,
+    subject,
+    text,
+    html,
   });
 }
