@@ -26,17 +26,18 @@ export async function uploadAvatar(req: Request, res: Response) {
 
   if (!req.file) {
     res.status(400).json({ message: 'No file uploaded' });
+
     return;
   }
 
   const avatarUrl = await UserService.uploadAvatar(userId, req.file.path);
-  res.status(200).json({ message: 'Аватарку успішно оновлено.', avatarUrl });
+  res.status(200).json({ message: 'Avatar updated successfully.', avatarUrl });
 }
 
 export async function deleteAvatar(req: Request, res: Response) {
   const { userId } = (req as unknown as { user: JwtPayload }).user;
   await UserService.deleteAvatar(userId);
-  res.status(200).json({ message: 'Аватарку видалено.' });
+  res.status(200).json({ message: 'Avatar deleted successfully.' });
 }
 
 function omitPasswordHash<T extends { passwordHash: string }>(user: T): Omit<T, 'passwordHash'> {

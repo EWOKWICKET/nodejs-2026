@@ -19,10 +19,10 @@ export async function login(req: LoginRequest, res: Response) {
 
 export async function requestPasswordReset(req: RequestPasswordResetRequest, res: Response) {
   await AuthService.requestPasswordReset(req.body);
-  res.status(200).json({ message: 'Якщо вказаний email зареєстрований, лист з інструкціями надіслано.' });
+  res.status(200).json({ message: 'The letter with the instructions has been sent.' });
 }
 
 export async function resetPassword(req: ResetPasswordRequest, res: Response) {
   await AuthService.resetPassword(req.body);
-  res.status(200).json({ message: 'Пароль успішно змінено.' });
+  res.status(200).json({ message: 'Password changed successfully.' });
 }

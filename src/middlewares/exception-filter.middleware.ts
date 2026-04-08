@@ -67,11 +67,13 @@ export function exceptionFilterMiddleware(
 
   if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
     res.status(400).json({ message: 'File too large. Maximum size is 5 MB' });
+
     return;
   }
 
   if (err.message === 'Only JPEG and PNG images are allowed') {
     res.status(400).json({ message: err.message });
+
     return;
   }
 
