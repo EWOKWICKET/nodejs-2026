@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services';
-import { JwtPayload } from '../types';
 
 type UserParams = { id: string };
 type GetUserByIdRequest = Request<UserParams>;
@@ -16,27 +15,23 @@ export async function getUserById(req: GetUserByIdRequest, res: Response) {
 }
 
 export async function getMe(req: Request, res: Response) {
-  const { userId } = (req as unknown as { user: JwtPayload }).user;
-  const user = await UserService.getUserById(userId);
+  const user = await UserService.getUserById(req.user.userId);
   res.status(200).json(omitPasswordHash(user));
 }
 
 export async function uploadAvatar(req: Request, res: Response) {
-  const { userId } = (req as unknown as { user: JwtPayload }).user;
-
   if (!req.file) {
     res.status(400).json({ message: 'No file uploaded' });
 
     return;
   }
 
-  const avatarUrl = await UserService.uploadAvatar(userId, req.file.buffer);
+  const avatarUrl = await UserService.uploadAvatar(req.user.userId, req.file.buffer);
   res.status(200).json({ message: 'Avatar updated successfully.', avatarUrl });
 }
 
 export async function deleteAvatar(req: Request, res: Response) {
-  const { userId } = (req as unknown as { user: JwtPayload }).user;
-  await UserService.deleteAvatar(userId);
+  await UserService.deleteAvatar(req.user.userId);
   res.status(200).json({ message: 'Avatar deleted successfully.' });
 }
 
