@@ -30,7 +30,7 @@ export async function uploadAvatar(req: Request, res: Response) {
     return;
   }
 
-  const avatarUrl = await UserService.uploadAvatar(userId, req.file.path);
+  const avatarUrl = await UserService.uploadAvatar(userId, req.file.buffer);
   res.status(200).json({ message: 'Avatar updated successfully.', avatarUrl });
 }
 
