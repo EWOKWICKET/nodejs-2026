@@ -2,8 +2,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../repositories';
 import { RegisterDto, LoginDto } from '../schemas';
-import { UnauthorizedError, ConflictError } from '../errors';
+import { UnauthorizedError, ConflictError, BadRequestError } from '../errors';
 import { JwtPayload, Role } from '../types';
+import { RequestPasswordResetDto, ResetPasswordDto } from '../schemas';
+import { sendPasswordResetEmail } from '../utils/sendMail';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -44,4 +46,31 @@ export async function login(dto: LoginDto) {
   const { passwordHash: _, ...userPublic } = user;
 
   return { token, user: userPublic };
+}
+
+export async function requestPasswordReset(dto: RequestPasswordResetDto): Promise<void> {
+  const user = await UserRepository.findByEmail(dto.email);
+  // Always return silently — do not reveal whether email exists
+  if (!user) return;
+
+  const resetToken = jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: '10m' });
+  await sendPasswordResetEmail(user.email, resetToken);
+}
+
+export async function resetPassword(dto: ResetPasswordDto): Promise<void> {
+  let email: string;
+  try {
+    const payload = jwt.verify(dto.token, JWT_SECRET) as { email: string };
+    email = payload.email;
+  } catch {
+    throw new BadRequestError({ message: 'Invalid or expired token' });
+  }
+
+  const user = await UserRepository.findByEmail(email);
+  if (!user) {
+    throw new BadRequestError({ message: 'Invalid or expired token' });
+  }
+
+  const passwordHash = await bcrypt.hash(dto.password, 10);
+  await UserRepository.update(user.id, { passwordHash });
 }
