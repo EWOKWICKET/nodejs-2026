@@ -1,4 +1,4 @@
-import { prisma } from '../db/prisma';
+import { prisma, TransactionClient } from '../db/prisma';
 import { NotFoundError } from '../errors';
 import { Loan, LoanStatus } from '../types';
 import { CreateLoanDto } from '../schemas';
@@ -24,12 +24,16 @@ export async function findActiveByBookId(bookId: string): Promise<Loan | null> {
   return prisma.loan.findFirst({ where: { bookId, status: LoanStatus.ACTIVE } });
 }
 
-export async function create(loanData: CreateLoanDto): Promise<Loan> {
-  return prisma.loan.create({
+export async function create(loanData: CreateLoanDto, tx?: TransactionClient): Promise<Loan> {
+  return (tx ?? prisma).loan.create({
     data: { ...loanData, loanDate: new Date(), status: LoanStatus.ACTIVE },
   });
 }
 
-export async function update(id: string, data: Partial<Loan>): Promise<Loan> {
-  return prisma.loan.update({ where: { id }, data });
+export async function update(
+  id: string,
+  data: Partial<Loan>,
+  tx?: TransactionClient,
+): Promise<Loan> {
+  return (tx ?? prisma).loan.update({ where: { id }, data });
 }

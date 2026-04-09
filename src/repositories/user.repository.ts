@@ -1,4 +1,4 @@
-import { prisma } from '../db/prisma';
+import { prisma, TransactionClient } from '../db/prisma';
 import { NotFoundError } from '../errors';
 import { User } from '../types';
 
@@ -23,6 +23,10 @@ export async function create(data: Omit<User, 'id'>): Promise<User> {
   return prisma.user.create({ data });
 }
 
-export async function update(id: string, data: Partial<Omit<User, 'id'>>): Promise<User> {
-  return prisma.user.update({ where: { id }, data });
+export async function update(
+  id: string,
+  data: Partial<Omit<User, 'id'>>,
+  tx?: TransactionClient,
+): Promise<User> {
+  return (tx ?? prisma).user.update({ where: { id }, data });
 }
