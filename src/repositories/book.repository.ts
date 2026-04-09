@@ -1,4 +1,4 @@
-import { prisma } from '../db/prisma';
+import { prisma, TransactionClient } from '../db/prisma';
 import { NotFoundError } from '../errors';
 import { Book } from '../types';
 import { CreateBookDto } from '../schemas';
@@ -22,8 +22,12 @@ export async function create(bookData: CreateBookDto): Promise<Book> {
   });
 }
 
-export async function update(id: string, data: Partial<Book>): Promise<Book> {
-  return prisma.book.update({ where: { id }, data });
+export async function update(
+  id: string,
+  data: Partial<Book>,
+  tx?: TransactionClient,
+): Promise<Book> {
+  return (tx ?? prisma).book.update({ where: { id }, data });
 }
 
 export async function remove(id: string): Promise<void> {

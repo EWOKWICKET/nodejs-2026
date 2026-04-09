@@ -1,4 +1,7 @@
 {
+  "ts-node": {
+    "files": true
+  },
   "compilerOptions": {
     // JavaScript version для компіляції
     "target": "ES2020",

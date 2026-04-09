@@ -1,8 +1,8 @@
 import { Loan, LoanStatus, Role } from '../types';
-import { LoanRepository } from '../repositories';
+import { LoanRepository, BookRepository } from '../repositories';
 import { CreateLoanDto } from '../schemas';
-import * as BookService from './book.service';
-import { BookBorrowedError } from '../errors';
+import { BookBorrowedError, ForbiddenError } from '../errors';
+import { withTransaction } from '../db/prisma';
 
 export async function getLoans(userId: string, role: Role): Promise<Loan[]> {
   if (role === Role.ADMIN) {
@@ -13,7 +13,7 @@ export async function getLoans(userId: string, role: Role): Promise<Loan[]> {
 }
 
 export async function createLoan(createLoanDto: CreateLoanDto): Promise<Loan> {
-  const book = await BookService.getBookByIdOrFail(createLoanDto.bookId);
+  const book = await BookRepository.findByIdOrFail(createLoanDto.bookId);
 
   if (!book.available) {
     throw new BookBorrowedError({ message: 'Book is unavailable' });
@@ -24,20 +24,32 @@ export async function createLoan(createLoanDto: CreateLoanDto): Promise<Loan> {
     throw new BookBorrowedError({ message: 'Book is already borrowed' });
   }
 
-  const newLoan = await LoanRepository.create(createLoanDto);
+  return withTransaction(async (tx) => {
+    const loan = await LoanRepository.create(createLoanDto, tx);
+    await BookRepository.update(createLoanDto.bookId, { available: false }, tx);
 
-  await BookService.updateBook(createLoanDto.bookId, { available: false });
-
-  return newLoan;
+    return loan;
+  });
 }
 
-export async function returnLoan(id: string): Promise<Loan> {
-  const loan = await LoanRepository.update(id, {
-    status: LoanStatus.RETURNED,
-    returnDate: new Date(),
+export async function returnLoan(id: string, userId: string, role: Role): Promise<Loan> {
+  const loan = await LoanRepository.findByIdOrFail(id);
+
+  if (role !== Role.ADMIN && loan.userId !== userId) {
+    throw new ForbiddenError({ message: 'You can only return your own loans' });
+  }
+
+  return withTransaction(async (tx) => {
+    const updated = await LoanRepository.update(
+      id,
+      {
+        status: LoanStatus.RETURNED,
+        returnDate: new Date(),
+      },
+      tx,
+    );
+    await BookRepository.update(updated.bookId, { available: true }, tx);
+
+    return updated;
   });
-
-  await BookService.updateBook(loan.bookId, { available: true });
-
-  return loan;
 }
